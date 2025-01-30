@@ -1,127 +1,174 @@
-# JLC2KiCadLib
+# LCSC to KiCad Library Converter GUI
 
-<p style="text-align: center;">
+A graphical user interface for converting LCSC/JLCPCB component libraries to KiCad format. This project builds upon and combines two excellent projects:
+- [JLC2KiCad_lib](https://github.com/TousstNicolas/JLC2KiCad_lib) by TousstNicolas
+- [lcsc2kicad](https://github.com/DasBasti/lcsc2kicad) by DasBasti
 
-[![PyPI version](https://badge.fury.io/py/JLC2KiCadLib.svg)](https://badge.fury.io/py/JLC2KiCadLib)
-![Python versions](https://img.shields.io/pypi/pyversions/JLC2KiCadLib.svg)
-[![Downloads](https://pepy.tech/badge/jlc2kicadlib)](https://pepy.tech/project/jlc2kicadlib)
-[![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+## Features
 
-</p>
-
-JLC2KiCadLib is a python script that generate a component library (symbol, footprint and 3D model) for KiCad from the JLCPCB/easyEDA library.
-This script requires **Python 3.6** or higher.
-
-## Example 
-
-
-
-easyEDA origin | KiCad result
----- | ----
-![JLCSymbol](https://raw.githubusercontent.com/TousstNicolas/JLC2KiCad_lib/master/images/JLC_Symbol_1.png) | ![KiCadSymbol](https://raw.githubusercontent.com/TousstNicolas/JLC2KiCad_lib/master/images/KiCad_Symbol_1.png)
-![JLCFootprint](https://raw.githubusercontent.com/TousstNicolas/JLC2KiCad_lib/master/images/JLC_Footprint_1.png) | ![KiCadFootprint](https://raw.githubusercontent.com/TousstNicolas/JLC2KiCad_lib/master/images/KiCad_Footprint_1.png)
-![JLC3Dmodel](https://raw.githubusercontent.com/TousstNicolas/JLC2KiCad_lib/master/images/JLC_3Dmodel.png) | ![KiCad3Dmodel](https://raw.githubusercontent.com/TousstNicolas/JLC2KiCad_lib/master/images/KiCad_3Dmodel.png)
+- User-friendly graphical interface
+- Easy component management:
+  - Add components with or without 'C' prefix
+  - Add comments to components
+  - Delete individual components
+  - Clear entire list
+- Save/Load component lists (JSON format)
+- Generate KiCad libraries including:
+  - Symbols (.kicad_sym)
+  - Footprints (.pretty)
+  - 3D Models (STEP format)
+- Progress tracking and error logging
 
 ## Installation
 
-Install using pip: 
-
-```
-pip install JLC2KiCadLib
-```
-
-Install from source:
-
-```
-git clone https://github.com/TousstNicolas/JLC2KiCad_lib.git
-cd JLC2KiCad_lib 
-pip install . 
+1. Clone the repository:
+```bash
+git clone https://github.com/YourUsername/lcsc2kicad-gui
+cd lcsc2kicad-gui
 ```
 
-## Usage 
-
-```
-usage: JLC2KiCadLib [-h] [-dir OUTPUT_DIR] [--no_footprint] [--no_symbol] [-symbol_lib SYMBOL_LIB] [-footprint_lib FOOTPRINT_LIB]
-                    [-models [{STEP,WRL} ...]] [--skip_existing] [-model_base_variable MODEL_BASE_VARIABLE]
-                    [-logging_level {DEBUG,INFO,WARNING,ERROR,CRITICAL}] [--log_file] [--version]
-                    JLCPCB_part_# [JLCPCB_part_# ...]
-
-take a JLCPCB part # and create the according component's kicad's library
-
-positional arguments:
-  JLCPCB_part_#         list of JLCPCB part # from the components you want to create
-
-options:
-  -h, --help            show this help message and exit
-  -dir OUTPUT_DIR       base directory for output library files
-  --no_footprint        use --no_footprint if you do not want to create the footprint
-  --no_symbol           use --no_symbol if you do not want to create the symbol
-  -symbol_lib SYMBOL_LIB
-                        set symbol library name, default is "default_lib"
-  -symbol_lib_dir SYMBOL_LIB_DIR
-                        Set symbol library path, default is "symbol" (relative to OUTPUT_DIR)
-  -footprint_lib FOOTPRINT_LIB
-                        set footprint library name, default is "footprint"
-  -models [{STEP,WRL} ...]
-                        Select the 3D model you want to use. Default is STEP. 
-                        If both are selected, only the STEP model will be added to the footprint (the WRL model will still be generated alongside the STEP model). 
-                        If you do not want any model to be generated, use the --models without arguments
-  -model_dir MODEL_DIR  Set directory for storing 3d models, default is "packages3d" (relative to FOOTPRINT_LIB)
-  --skip_existing       use --skip_existing if you want do not want to replace already existing footprints and symbols
-  -model_base_variable MODEL_BASE_VARIABLE
-                        use -model_base_variable if you want to specify the base path of the 3D model using a path variable
-  -logging_level {DEBUG,INFO,WARNING,ERROR,CRITICAL}
-                        set logging level. If DEBUG is used, the debug logs are only written in the log file if the option --log_file is set
-  --log_file            use --log_file if you want logs to be written in a file
-  --version             Print versin number and exit
-
-exemple use : 
-        JLC2KiCadLib C1337258 C24112 -dir My_lib -symbol_lib My_Symbol_lib --no_footprint
+2. Install dependencies:
+```bash
+pip install requests lxml pillow svg2mod semantic-version KicadModTree PySide6
 ```
 
-The only required arguments are the JLCPCP_part number (e.g. Cxxxxx)
+## Usage
 
-Example usage : 
-```
-JLC2KiCadLib C1337258 C24112 -dir My_lib                       \
-                             -model_dir My_model_dir           \
-                             -footprint_lib My_footprint_lib   \
-                             -symbol_lib_dir My_symbol_lib_dir \
-                             -symbol_lib My_symbol_lib
+### Starting the GUI
+
+Run the GUI application:
+```bash
+python gui.py
 ```
 
-This example will create the symbol, footprint and 3D model for the two components specified and will output the symbol in the `./My_lib/symbol/My_symbol_lib.lib` file, the footprint and 3D model will be created in the `./My_lib/Footprint`. This will result in the following tree to be created : 
+### Adding Components
 
+1. Enter LCSC part number in the input field:
+   - Can enter with or without 'C' prefix (e.g., "C2931873" or "2931873")
+   - Press Enter or click "Add Part"
+
+2. Add comments (optional):
+   - Select a component from the list
+   - Enter comment in the comment field
+   - Press Enter or click "Update Comment"
+
+### Managing Component Lists
+
+- **Save List**: Save your current component list with comments to a JSON file
+- **Load List**: Load a previously saved component list
+- **Delete Selected**: Remove selected component from the list
+- **Clear All**: Remove all components from the list
+
+### Converting Components
+
+1. Select output directory using "Browse"
+2. Set symbol library name (default: "components")
+3. Choose whether to include 3D models (STEP format)
+4. Click "Convert" to start the conversion process
+
+### Output Structure
+
+The converter will create the following directory structure:
 ```
-My_lib
-├── My_footprint_lib
-│   ├── My_model_dir
-│   │   ├── QFN-24_L4.0-W4.0-P0.50-BL-EP2.7.step
-│   │   └── VQFN-48_L7.0-W7.0-P0.50-BL-EP5.5.step
-│   ├── QFN-24_L4.0-W4.0-P0.50-BL-EP2.7.kicad_mod
-│   └── VQFN-48_L7.0-W7.0-P0.50-BL-EP5.5.kicad_mod
-└── My_symbol_lib_dir
-    └── My_symbol_lib.kicad_sym
+output_directory/
+├── footprint.pretty/      # Footprint library
+│   ├── packages3d/       # 3D models
+│   │   ├── component1.step
+│   │   └── component2.step
+│   ├── component1.kicad_mod
+│   └── component2.kicad_mod
+└── symbol/
+    └── components.kicad_sym
 ```
 
-Most of those arguments are optional. The only required argument is the JLCPCB part #.
+### Importing to KiCad
 
-The JLCPCB part # is found in the part info section of every component in the JLCPCB part library. 
+1. Symbol Library:
+   - Preferences → Manage Symbol Libraries
+   - Add existing library
+   - Select `symbol/components.kicad_sym`
 
-By default, the library folder will be created in the execution directory. You can specify an absolute path with the -dir option. 
+2. Footprint Library:
+   - Preferences → Manage Footprint Libraries
+   - Add existing library
+   - Select the `.pretty` folder
 
-## Dependencies 
+3. 3D Models:
+   - Automatically linked if directory structure is maintained
 
-JLC2KiCadLib relies on the [KicadModTree](https://gitlab.com/kicad/libraries/kicad-footprint-generator) framework to generate the footprints. 
+## Credits
 
-## Notes
+This project combines and builds upon two excellent LCSC/JLCPCB to KiCad converters:
 
-* Even so I tested the script on a lot of components, be careful and always check the output footprint and symbol.
-* I consider this project completed. I will continue to maintain it if a bug report is filed, but I will not develop new functionality in the near future. If you feel that an important feature is missing, please open an issue to discuss it, then you can fork this project with a new branch before submitting a PR. 
+### JLC2KiCad_lib
+- Original Repository: [JLC2KiCad_lib](https://github.com/TousstNicolas/JLC2KiCad_lib) by TousstNicolas
+- Features used:
+  - Core conversion functionality
+  - Symbol generation
+  - Footprint creation
+  - 3D model handling
+- License: MIT
 
-## License 
+### lcsc2kicad
+- Original Repository: [lcsc2kicad](https://github.com/DasBasti/lcsc2kicad) by DasBasti
+- Features used:
+  - Initial inspiration
+  - LCSC component handling approach
+  - Project structure influence
+- License: MIT
 
-Copyright © 2021 TousstNicolas 
+## Contributing
 
-The code is released under the MIT license
+Contributions are welcome! Please feel free to submit a Pull Request. For major changes, please open an issue first to discuss what you would like to change.
+
+## License
+
+This project is released under the MIT License, matching the licenses of both original projects it builds upon.
+
+## Troubleshooting
+
+### Common Issues
+
+1. **Component Not Found**
+   - Verify the LCSC part number is correct
+   - Check if the component exists on JLCPCB's website
+   - Make sure to use the correct format (with or without 'C' prefix)
+
+2. **Conversion Errors**
+   - Check the log output for specific error messages
+   - Verify all dependencies are installed correctly
+   - Ensure you have write permissions in the output directory
+
+3. **Import Issues**
+   - Make sure KiCad paths are set correctly
+   - Verify the library files are in the expected locations
+   - Check if all necessary files were generated
+
+### Component List Management
+
+1. **Saving Lists**
+   - Lists are saved in JSON format
+   - Include any relevant comments for future reference
+   - Use meaningful filenames for easy identification
+
+2. **Loading Lists**
+   - Make sure the JSON file is properly formatted
+   - All component numbers should be valid
+   - Comments will be preserved when loading
+
+### GUI Usage Tips
+
+1. **Adding Components**
+   - You can paste part numbers directly from JLCPCB website
+   - Use comments to track component purposes
+   - The GUI automatically handles 'C' prefix normalization
+
+2. **Batch Processing**
+   - Save commonly used component lists for quick access
+   - Use clear comments to identify component purposes
+   - Check the log output for conversion progress
+
+3. **Library Organization**
+   - Keep related components in separate list files
+   - Use meaningful comments for better organization
+   - Maintain a consistent naming scheme for saved lists
